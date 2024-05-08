@@ -1,4 +1,5 @@
-import express from "express";
+import express from 'express';
+import authRouter from './routes/auth.route.js';
 
 const app = express();
 
@@ -11,6 +12,4 @@ app.listen(3000, () => {
 });
 
 // Routes
-app.get("/", (req, res) => {
-  res.send("Hola Mundo");
-});
+app.use('/api/auth', authRouter);
