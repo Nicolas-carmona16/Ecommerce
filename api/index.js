@@ -9,3 +9,8 @@ app.use(express.json());
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
 });
+
+// Routes
+app.get("/", (req, res) => {
+  res.send("Hola Mundo");
+});
