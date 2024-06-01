@@ -8,6 +8,7 @@ import categoryRouter from "./routes/category.route.js";
 import cartRouter from "./routes/cart.route.js"
 import addressRouter from "./routes/address.route.js"
 import paymentMethodRouter from "./routes/paymentMethod.route.js";
+import setupSwagger from "./swagger.js";
 
 const app = express();
 
@@ -22,6 +23,9 @@ app.use(
 //Middleware for JSON parsing
 app.use(express.json());
 app.use(cookieParser());
+
+// Setup Swagger
+setupSwagger(app);
 
 // RUN SERVER
 app.listen(3000, () => {
