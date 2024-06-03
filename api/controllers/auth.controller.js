@@ -50,11 +50,10 @@ export const signin = async (req, res) => {
       { expiresIn: "1h" }
     );
 
-
-    res.cookie('access_token', token, {
+    res.cookie("access_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // En producción, enviar solo sobre HTTPS
-      maxAge: 3600000 // Tiempo de vida de la cookie en milisegundos
+      maxAge: 3600000, // Tiempo de vida de la cookie en milisegundos
     });
 
     res.status(200).json({ message: "successful login" });
@@ -68,6 +67,36 @@ export const signout = async (req, res) => {
     res.clearCookie("access_token");
     res.status(200).json({ message: "signed out successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Failed to log out.", error: error.message })
+    res
+      .status(500)
+      .json({ message: "Failed to log out.", error: error.message });
   }
-}
+};
+
+export const createAdmin = async (req, res) => {
+  const { name, lastname, email, password } = req.body;
+  const role_id = 1; // Assigns the role_id of 'admin'
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const [results] = await connection.query(
+      `INSERT INTO user (name, lastname, email, password, role_id) VALUES (?, ?, ?, ?, ?)`,
+      [name, lastname, email, hashedPassword, role_id]
+    );
+
+    res.status(201).json({
+      message: "Admin user created successfully!",
+      userId: results.insertId,
+    });
+  } catch (error) {
+    if (error.code === "ER_DUP_ENTRY") {
+      res.status(409).json({ message: "Email is already used" });
+    } else {
+      res
+        .status(500)
+        .json({
+          message: "Error registering admin user",
+          error: error.message,
+        });
+    }
+  }
+};

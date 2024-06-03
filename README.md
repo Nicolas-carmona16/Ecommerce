@@ -38,3 +38,7 @@ npm run dev
 
 - Backend: Node.js, Express, MySQL
 - Frontend: React
+
+## API documentation
+This is the API documentation for the eCommerce application. The API allows you to manage users, products, categories, shopping carts, orders, addresses and payment methods.
+To access the interactive API documentation, visit http://localhost:3000/api-docs. Here you can explore and test the different API endpoints.

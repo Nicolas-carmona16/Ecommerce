@@ -31,6 +31,7 @@ CREATE TABLE product (
   description TEXT,
   price DECIMAL(10, 2) NOT NULL,
   category_id INT,
+  image_url VARCHAR(255),
   FOREIGN KEY (category_id) REFERENCES category(category_id),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
