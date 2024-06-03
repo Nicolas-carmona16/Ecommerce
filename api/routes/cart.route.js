@@ -7,6 +7,7 @@ import {
   getCartTotal,
   clearCart,
   getOrderSummary,
+  getCartItemCount,
 } from "../controllers/cart.controller.js";
 import authenticateJWT from "../middlewares/authenticate.js";
 
@@ -186,5 +187,7 @@ router.delete("/", authenticateJWT, clearCart);
  *         description: Error retrieving order summary
  */
 router.get("/summary", authenticateJWT, getOrderSummary);
+
+router.get('/count', authenticateJWT, getCartItemCount);
 
 export default router;

@@ -5,9 +5,13 @@ export const getCart = async (req, res) => {
   const userId = req.user.userId;
   try {
     const [cartItems] = await connection.query(
-      'SELECT product_id, quantity FROM cart_product WHERE cart_id = (SELECT cart_id FROM shopping_cart WHERE user_id = ? AND status = "active")',
+      `SELECT p.product_id, p.image_url, p.price, cp.quantity
+       FROM cart_product cp
+       JOIN product p ON cp.product_id = p.product_id
+       WHERE cp.cart_id = (SELECT cart_id FROM shopping_cart WHERE user_id = ? AND status = "active")`,
       [userId]
     );
+
     res.json(cartItems);
   } catch (error) {
     res
@@ -128,13 +132,30 @@ export const deleteFromCart = async (req, res) => {
 
     const cartId = cart[0].cart_id;
 
-    const [result] = await connection.query(
-      "DELETE FROM cart_product WHERE cart_id = ? AND product_id = ?",
+    // Buscar el producto en el carrito y obtener su cantidad actual
+    const [productInCart] = await connection.query(
+      "SELECT quantity FROM cart_product WHERE cart_id = ? AND product_id = ?",
       [cartId, productId]
     );
 
-    if (result.affectedRows === 0) {
+    if (productInCart.length === 0) {
       return res.status(404).json({ message: "Product not found in cart" });
+    }
+
+    const currentQuantity = productInCart[0].quantity;
+
+    if (currentQuantity > 1) {
+      // Si hay más de una instancia del producto, reducir la cantidad en 1
+      await connection.query(
+        "UPDATE cart_product SET quantity = quantity - 1 WHERE cart_id = ? AND product_id = ?",
+        [cartId, productId]
+      );
+    } else {
+      // Si solo hay una instancia del producto, eliminarlo del carrito
+      await connection.query(
+        "DELETE FROM cart_product WHERE cart_id = ? AND product_id = ?",
+        [cartId, productId]
+      );
     }
 
     res.json({ message: "Product removed from cart" });
@@ -189,10 +210,33 @@ export const getOrderSummary = async (req, res) => {
 
     res.json({ items: cartItems, total: total[0].total });
   } catch (error) {
+    res.status(500).json({
+      message: "Error retrieving order summary",
+      error: error.message,
+    });
+  }
+};
+
+// Obtener la cantidad de productos en el carrito del usuario autenticado
+export const getCartItemCount = async (req, res) => {
+  const userId = req.user.user_id;
+  try {
+    const [rows] = await connection.query(
+      `
+      SELECT SUM(cart_product.quantity) AS itemCount 
+      FROM cart_product 
+      INNER JOIN shopping_cart ON cart_product.cart_id = shopping_cart.cart_id 
+      WHERE shopping_cart.user_id = ? AND shopping_cart.status = 'active'
+    `,
+      [userId]
+    );
+    const itemCount = rows[0].itemCount || 0;
+    res.json({ itemCount });
+  } catch (error) {
     res
       .status(500)
       .json({
-        message: "Error retrieving order summary",
+        message: "Error retrieving cart item count",
         error: error.message,
       });
   }

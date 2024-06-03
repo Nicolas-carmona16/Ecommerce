@@ -4,6 +4,7 @@ import {
   signin,
   signout,
   createAdmin,
+  checkAuth,
 } from "../controllers/auth.controller.js";
 import authorizeAdmin from "../middlewares/isAdmin.js";
 import authenticateJWT from "../middlewares/authenticate.js";
@@ -55,6 +56,40 @@ const router = express.Router();
  *         email: johndoe@example.com
  *         password: password123
  */
+
+/**
+ * @swagger
+ * /api/auth/check:
+ *   get:
+ *     summary: Check authentication status
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Authentication status and user information
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 isAuthenticated:
+ *                   type: boolean
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     user_id:
+ *                       type: integer
+ *                     email:
+ *                       type: string
+ *                     role_id:
+ *                       type: integer
+ *                     name:
+ *                       type: string
+ *                     lastname:
+ *                       type: string
+ *       401:
+ *         description: User not authenticated
+ */
+router.get("/check", checkAuth)
 
 /**
  * @swagger

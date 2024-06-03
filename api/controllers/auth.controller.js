@@ -2,6 +2,19 @@ import bcrypt from "bcryptjs";
 import connection from "../configuration/database.js";
 import jwt from "jsonwebtoken";
 
+export const checkAuth = (req, res) => {
+  try {
+    const token = req.cookies.access_token;
+    if (!token) {
+      return res.status(401).json({ isAuthenticated: false });
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    res.json({ isAuthenticated: true, user: decoded });
+  } catch (error) {
+    res.status(401).json({ isAuthenticated: false });
+  }
+};
+
 export const signup = async (req, res) => {
   const { name, lastname, email, password } = req.body;
   const role_id = 2; // Assigns the role_id of 'customer' predefined
@@ -91,12 +104,10 @@ export const createAdmin = async (req, res) => {
     if (error.code === "ER_DUP_ENTRY") {
       res.status(409).json({ message: "Email is already used" });
     } else {
-      res
-        .status(500)
-        .json({
-          message: "Error registering admin user",
-          error: error.message,
-        });
+      res.status(500).json({
+        message: "Error registering admin user",
+        error: error.message,
+      });
     }
   }
 };

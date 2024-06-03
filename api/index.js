@@ -15,7 +15,7 @@ const app = express();
 // Configurar CORS
 app.use(
   cors({
-    origin: "http://localhost:3000", // Permitir solicitudes desde localhost:3000
+    origin: "http://localhost:5173", // Permitir solicitudes desde localhost:3000 - 5173
     credentials: true, // Permitir el envío de cookies y encabezados de autenticación
   })
 );
