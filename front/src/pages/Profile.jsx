@@ -13,12 +13,12 @@ const Profile = () => {
 
   useEffect(() => {
     if (user) {
-      setProfile({
-        name: user.name,
-        lastname: user.lastname,
-        email: user.email,
-        password: "",
-      });
+      setProfile((prevProfile) => ({
+        ...prevProfile,
+        name: user.name || "",
+        lastname: user.lastname || "",
+        email: user.email || "",
+      }));
     }
   }, [user]);
 
@@ -55,7 +55,7 @@ const Profile = () => {
           <input
             type="text"
             name="name"
-            value={profile.name}
+            value={profile.name || ""}
             onChange={handleChange}
             className="w-full p-2 border rounded-lg"
             required
@@ -66,7 +66,7 @@ const Profile = () => {
           <input
             type="text"
             name="lastname"
-            value={profile.lastname}
+            value={profile.lastname || ""}
             onChange={handleChange}
             className="w-full p-2 border rounded-lg"
             required
@@ -77,7 +77,7 @@ const Profile = () => {
           <input
             type="email"
             name="email"
-            value={profile.email}
+            value={profile.email || ""}
             onChange={handleChange}
             className="w-full p-2 border rounded-lg"
             required
@@ -88,7 +88,7 @@ const Profile = () => {
           <input
             type="password"
             name="password"
-            value={profile.password}
+            value={profile.password || ""}
             onChange={handleChange}
             className="w-full p-2 border rounded-lg"
             required
