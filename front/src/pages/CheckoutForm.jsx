@@ -2,6 +2,14 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+const formatDate = (isoString) => {
+  const date = new Date(isoString);
+  const year = date.getFullYear();
+  const month = `0${date.getMonth() + 1}`.slice(-2);
+  const day = `0${date.getDate()}`.slice(-2);
+  return `${year}-${month}-${day}`;
+};
+
 const CheckoutForm = () => {
   const [address, setAddress] = useState({
     street: "",
@@ -43,7 +51,10 @@ const CheckoutForm = () => {
           }
         );
         if (response.data) {
-          setPaymentMethod(response.data);
+          setPaymentMethod({
+            ...response.data,
+            expiry: formatDate(response.data.expiry), // Convertir la fecha
+          });
         }
       } catch (error) {
         console.error("Error fetching payment method:", error);
