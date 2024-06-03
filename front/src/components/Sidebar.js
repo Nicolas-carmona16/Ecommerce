@@ -32,7 +32,7 @@ const Sidebar = () => {
             <FiTrash2/>
           </div>
         </div>
-        <Link to='/'className='bg-primary flex p-4 justify-center items-center text-white w-full font-medium' >
+        <Link onClick={handleClose} to='/checkout'className='bg-primary flex p-4 justify-center items-center text-white w-full font-medium' >
           Checkout
         </Link>
       </div>

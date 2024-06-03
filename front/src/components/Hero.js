@@ -16,7 +16,8 @@ const Hero = () => {
           XYZ STYLE <br/>
           <span className='font-semibold'>NEW COLLECTION</span>
         </h1>
-        <Link to={'/'} className='self-start uppercase font-semibold border-b-2 border-primary'>No se que poner aquí</Link>
+        <Link to={'/login'} className='text-[30px] self-start uppercase font-semibold border-b-2 hover:text-red-400 '>Login Now!</Link>
+        <Link to={'/register'} className='text-[30px] self-start uppercase font-semibold border-b-2 hover:text-red-400 '>Register Now!</Link>
       </div>
       <div className='hidden lg:block'>
         <img src={Img} alt=''/>
