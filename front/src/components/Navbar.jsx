@@ -33,15 +33,33 @@ const Navbar = () => {
                   Profile
                 </Link>
               </li>
-              {user && user.role_id === 1 && (
-                <li>
-                  <Link
-                    className="text-black hover:text-red-500"
-                    to="/add-product"
-                  >
-                    Add Product
-                  </Link>
-                </li>
+              {user && user.role === 1 && (
+                <>
+                  <li>
+                    <Link
+                      className="text-black hover:text-red-500"
+                      to="/add-product"
+                    >
+                      Add Product
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      className="text-black hover:text-red-500"
+                      to="/create-category"
+                    >
+                      Create Category
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      className="text-black hover:text-red-500"
+                      to="/manage-categories"
+                    >
+                      Manage Categories
+                    </Link>
+                  </li>
+                </>
               )}
               <li>
                 <button

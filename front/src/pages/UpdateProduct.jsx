@@ -1,35 +1,42 @@
 import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
-const AddProduct = () => {
+const UpdateProduct = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-  const [categories, setCategories] = useState([]);
   const [message, setMessage] = useState("");
-  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchProduct = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/category");
-        setCategories(response.data);
+        const response = await axios.get(
+          `http://localhost:3000/api/product/${id}`
+        );
+        const product = response.data;
+        setName(product.name);
+        setDescription(product.description);
+        setPrice(product.price);
+        setCategoryId(product.category_id);
+        setImageUrl(product.image_url);
       } catch (error) {
-        console.error("Error fetching categories:", error);
+        console.error("Error fetching product:", error);
       }
     };
 
-    fetchCategories();
-  }, []);
+    fetchProduct();
+  }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(
-        "http://localhost:3000/api/product",
+      await axios.put(
+        `http://localhost:3000/api/product/${id}`,
         {
           name,
           description,
@@ -41,25 +48,23 @@ const AddProduct = () => {
           withCredentials: true,
         }
       );
-      setMessage("Product added successfully!");
-      setName("");
-      setDescription("");
-      setPrice("");
-      setCategoryId("");
-      setImageUrl("");
+      setMessage("Product updated successfully!");
       navigate("/");
     } catch (error) {
-      setMessage("Failed to add product");
-      console.error("Error adding product:", error);
+      setMessage("Failed to update product");
+      console.error("Error updating product:", error.response.data);
     }
   };
 
   return (
     <div className="max-w-4xl mx-auto my-10 p-5 bg-white rounded-lg shadow-md">
-      <h1 className="text-4xl font-bold mb-6">Add Product</h1>
+      <h1 className="text-4xl font-bold mb-6">Update Product</h1>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
+          <label
+            className="block text-gray-700 text-sm font-bold mb-2"
+            htmlFor="name"
+          >
             Name
           </label>
           <input
@@ -72,7 +77,10 @@ const AddProduct = () => {
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
+          <label
+            className="block text-gray-700 text-sm font-bold mb-2"
+            htmlFor="description"
+          >
             Description
           </label>
           <textarea
@@ -84,7 +92,10 @@ const AddProduct = () => {
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="price">
+          <label
+            className="block text-gray-700 text-sm font-bold mb-2"
+            htmlFor="price"
+          >
             Price
           </label>
           <input
@@ -97,26 +108,26 @@ const AddProduct = () => {
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="categoryId">
-            Category
+          <label
+            className="block text-gray-700 text-sm font-bold mb-2"
+            htmlFor="categoryId"
+          >
+            Category ID
           </label>
-          <select
+          <input
+            type="text"
             id="categoryId"
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             required
-          >
-            <option value="">Select a category</option>
-            {categories.map((category) => (
-              <option key={category.category_id} value={category.category_id}>
-                {category.category_name}
-              </option>
-            ))}
-          </select>
+          />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="imageUrl">
+          <label
+            className="block text-gray-700 text-sm font-bold mb-2"
+            htmlFor="imageUrl"
+          >
             Image URL
           </label>
           <input
@@ -133,7 +144,7 @@ const AddProduct = () => {
             type="submit"
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           >
-            Add Product
+            Update Product
           </button>
         </div>
         {message && <p className="mt-4 text-red-500">{message}</p>}
@@ -142,4 +153,4 @@ const AddProduct = () => {
   );
 };
 
-export default AddProduct;
+export default UpdateProduct;

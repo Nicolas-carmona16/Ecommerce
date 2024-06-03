@@ -1,22 +1,23 @@
 import React, { useEffect, useState, useContext } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { addToCart } from "../services/api";
 import { CartContext } from "../context/CartContext";
+import { AuthContext } from "../context/AuthContext";
 
 const ProductDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { loadCart } = useContext(CartContext);
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:3000/api/product/${id}`
-        );
+        const response = await axios.get(`http://localhost:3000/api/product/${id}`);
         setProduct(response.data);
         setLoading(false);
       } catch (error) {
@@ -37,12 +38,23 @@ const ProductDetails = () => {
     }
   };
 
+  const handleDeleteProduct = async () => {
+    try {
+      await axios.delete(`http://localhost:3000/api/product/${id}`, {
+        withCredentials: true,
+      });
+      navigate("/");
+    } catch (error) {
+      console.error("Failed to delete product", error);
+    }
+  };
+
+  const handleUpdateProduct = () => {
+    navigate(`/update-product/${id}`);
+  };
+
   if (loading) {
-    return (
-      <section className="h-screen flex justify-center items-center">
-        Loading...
-      </section>
-    );
+    return <div>Loading...</div>;
   }
 
   if (error) {
@@ -57,34 +69,42 @@ const ProductDetails = () => {
   }).format(product.price);
 
   return (
-    <section className="pt-32 pb-12 lg:py-32 h-screen flex items-center">
-      <div className="container mx-auto">
-        <div className="flex flex-col lg:flex-row items-center">
-          <div className="flex flex-1 justify-center items-center mb-8 lg:mb-0">
-            <img
-              className="max-w-[200px] lg:max-w-sm"
-              src={product.image_url}
-              alt={product.name}
-            />
-          </div>
-          <div className="flex-1 text-center lg:text-left">
-            <h1 className="text-[26px] font-medium mb-2 max-w-[450px] mx-auto lg:mx-0">
-              {product.name}
-            </h1>
-            <div className="text-xl text-red-500 font-medium mb-6">
-              {formattedPrice}
+    <div className="max-w-4xl mx-auto my-10 p-5 bg-white rounded-lg shadow-md">
+      <h1 className="text-4xl font-bold mb-6">{product.name}</h1>
+      <div className="flex flex-col md:flex-row items-center">
+        <img
+          src={product.image_url}
+          alt={product.name}
+          className="w-64 h-64 object-cover mb-4 md:mb-0 md:mr-6 rounded-lg"
+        />
+        <div>
+          <p className="text-lg mb-4">{product.description}</p>
+          <p className="text-2xl font-semibold mb-4 text-red-600">{formattedPrice}</p>
+          <button
+            onClick={handleAddToCart}
+            className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-600 transition-colors"
+          >
+            + Add to Cart
+          </button>
+          {user && user.role === 1 && (
+            <div className="mt-4">
+              <button
+                onClick={handleUpdateProduct}
+                className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors mr-2"
+              >
+                Update Product
+              </button>
+              <button
+                onClick={handleDeleteProduct}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+              >
+                Delete Product
+              </button>
             </div>
-            <p className="mb-8">{product.description}</p>
-            <button
-              onClick={handleAddToCart}
-              className="bg-black py-4 px-8 text-white rounded-lg hover:bg-gray-700 transition-colors"
-            >
-              + Add to Cart
-            </button>
-          </div>
+          )}
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 

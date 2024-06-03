@@ -2,8 +2,8 @@ import React, { useContext } from "react";
 import { Navigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useContext(AuthContext);
+const ProtectedRoute = ({ children, roles = [] }) => {
+  const { isAuthenticated, user, loading } = useContext(AuthContext);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -11,6 +11,10 @@ const ProtectedRoute = ({ children }) => {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
+  }
+
+  if (roles.length && !roles.includes(user.role)) {
+    return <div>You are not authorized to view this page.</div>;
   }
 
   return children;
