@@ -31,14 +31,6 @@ const Cart = () => {
     navigate("/order-summary");
   };
 
-  const handleClearCart = async () => {
-    try {
-      await clearCart();
-    } catch (error) {
-      alert("Failed to clear cart");
-    }
-  };
-
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -107,7 +99,7 @@ const Cart = () => {
           </div>
           <div className="mt-4 text-right">
             <button
-              onClick={handleClearCart}
+              onClick={clearCart}
               className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors mr-2"
             >
               Clear Cart

@@ -8,25 +8,22 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:3000/api/auth/check",
-          {
-            withCredentials: true,
-          }
-        );
-        setIsAuthenticated(response.data.isAuthenticated);
-        setUser(response.data.user);
-        setLoading(false);
-      } catch (error) {
-        setIsAuthenticated(false);
-        setUser(null);
-        setLoading(false);
-      }
-    };
+  const checkAuth = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/api/auth/check", {
+        withCredentials: true,
+      });
+      setIsAuthenticated(response.data.isAuthenticated);
+      setUser(response.data.user);
+      setLoading(false);
+    } catch (error) {
+      setIsAuthenticated(false);
+      setUser(null);
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     checkAuth();
   }, []);
 
@@ -41,6 +38,7 @@ export const AuthProvider = ({ children }) => {
       );
       setIsAuthenticated(true);
       setUser(response.data.user);
+      checkAuth(); // Verificar autenticación después de iniciar sesión
       return true;
     } catch (error) {
       return false;
@@ -54,6 +52,7 @@ export const AuthProvider = ({ children }) => {
       });
       setIsAuthenticated(false);
       setUser(null);
+      checkAuth(); // Verificar autenticación después de cerrar sesión
     } catch (error) {
       console.error("Error logging out:", error);
     }
@@ -61,9 +60,9 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, user, login, logout, loading }}
+      value={{ isAuthenticated, user, login, logout, loading, checkAuth }}
     >
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 };

@@ -1,6 +1,7 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { clearCart as clearCartAPI } from "../services/api";
+import { AuthContext } from "./AuthContext";
 
 export const CartContext = createContext();
 
@@ -8,6 +9,7 @@ export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [itemAmount, setItemAmount] = useState(0);
   const [total, setTotal] = useState(0);
+  const { isAuthenticated } = useContext(AuthContext);
 
   const loadCart = async () => {
     try {
@@ -21,8 +23,12 @@ export const CartProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    loadCart();
-  }, []);
+    if (isAuthenticated) {
+      loadCart();
+    } else {
+      setCart([]);
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const total = cart.reduce((accumulator, currentItem) => {
@@ -67,7 +73,7 @@ export const CartProvider = ({ children }) => {
   const clearCart = async () => {
     try {
       await clearCartAPI();
-      setCart([]);
+      loadCart(); // Recargar el carrito después de limpiarlo
     } catch (error) {
       console.error("Error clearing cart:", error);
     }

@@ -69,13 +69,21 @@ export const updateProduct = async (req, res) => {
 export const deleteProduct = async (req, res) => {
   const productId = req.params.id;
   try {
+    // First, delete associated records from cart_product
+    await connection.query("DELETE FROM cart_product WHERE product_id = ?", [
+      productId,
+    ]);
+
+    // Then, delete the product
     const [result] = await connection.query(
       "DELETE FROM product WHERE product_id = ?",
       [productId]
     );
+
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Product not found" });
     }
+
     res.json({ message: "Product deleted successfully" });
   } catch (error) {
     res
